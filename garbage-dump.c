@@ -3,6 +3,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <unistd.h>
 
 // Note: ((rand() % (max + 1 - min)) + min) is used to generate random
 //       characters within a certain range.
@@ -52,6 +53,15 @@ int main(int argc, char* argv[]) {
 						strcpy(currentFile, targetLocation);
 						strcat(currentFile, "/");
 						strcat(currentFile, filename);
+
+						// Re-generate the filename until one
+						// is generated that doesn't already exist.
+						while (access(currentFile, F_OK) != -1) {
+							generateRandomFilename(filename, 20);
+							strcpy(currentFile, targetLocation);
+							strcat(currentFile, "/");
+							strcat(currentFile, filename);
+						}
 
 						// Open current target file for writing.
 						file = fopen(currentFile, fileMode);
