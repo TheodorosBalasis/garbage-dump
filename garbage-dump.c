@@ -8,93 +8,100 @@
 //       characters within a certain range.
 
 // Generates a random string of set size.
-char* randomString(size_t size);
+void generateRandomString(char* buffer, size_t size);
 // Generates a random file name consisting of uppercase characters.
-char* randomFilename(size_t size);
+void generateRandomFilename(char* buffer, size_t size);
 
 int main(int argc, char* argv[]) {
+	int exitCode = 0;
+
+	// Too few arguments error handling.
 	if (argc < 4) {
 		fprintf(stderr,
 		        "Usage: garbage-dump <target location> <bytes to fill> "
 		        "<file size>");
-	}
+		exitCode = 1;
+	} else {
+		// Program parameters.
+		char* targetLocation = argv[1];
+		size_t capacity = atoll(argv[2]);
+		size_t chunkSize = atoll(argv[3]);
+		size_t numberOfFiles = capacity / chunkSize;
 
-	// Program parameters.
-	char* targetLocation = argv[1];
-	size_t capacity = atoll(argv[2]);
-	size_t chunkSize = atoll(argv[3]);
-	size_t numberOfFiles = capacity / chunkSize;
+		if (capacity) {
+			if (chunkSize) {
+				// Initialize the random number generator.
+				time_t currentTime;
+				time(&currentTime);
+				srand(currentTime);
 
-	if (capacity) {
-		if (chunkSize) {
-			// Initialize the random number generator.
-			time_t currentTime;
-			time(&currentTime);
-			srand(currentTime);
+				char fileMode[2];
+				strcpy(fileMode, "w");
 
-			char fileMode[2];
-			strcpy(fileMode, "w");
+				FILE* file;
 
-			FILE* file;
+				char currentFile[PATH_MAX];
+				char* filename = malloc(sizeof(char) * 20);
+				char* chars = malloc(sizeof(char) * chunkSize);
 
-			char currentFile[PATH_MAX];
-			char* filename;
+				// Ensure filename and chars were allocated before continuing.
+				if (filename && chars) {
+					for (int i = 0; i < numberOfFiles; i++) {
+						// Construct the full file path.
+						generateRandomFilename(filename, 20);
+						strcpy(currentFile, targetLocation);
+						strcat(currentFile, "/");
+						strcat(currentFile, filename);
 
-			for (int i = 0; i < numberOfFiles; i++) {
-				// Construct the full file path.
-				filename = randomFilename(20);
-				strcpy(currentFile, targetLocation);
-				strcat(currentFile, "/");
-				strcat(currentFile, filename);
+						// Open current target file for writing.
+						file = fopen(currentFile, fileMode);
 
-				// Write a random string to the current target path.
-				file = fopen(currentFile, fileMode);
+						if (file) {
+							generateRandomString(chars, chunkSize);
+							fputs(chars, file);
+							fclose(file);
+						} else {
+							fprintf(stderr,
+							        "Could not open file %s for writing",
+							        currentFile);
+						}
+					}
 
-				if (file) {
-					char* chars = randomString(chunkSize);
-					fputs(chars, file);
-					fclose(file);
+					free(filename);
 					free(chars);
+				} else {
+					fprintf(stderr,
+					        "Could not allocate buffers for filename and file "
+					        "data.");
+					exitCode = 1;
 				}
-
-				free(filename);
+			} else {
+				fprintf(stderr, "Invalid chunk size!");
+				free(targetLocation);
+				exitCode = 1;
 			}
-
-			return 0;
-		} else {
-			fprintf(stderr, "Invalid chunk size!");
-			free(targetLocation);
-			return 1;
 		}
 	}
 
-	return 0;
+	return exitCode;
 }
 
-char* randomString(size_t size) {
-	char* chars = malloc(sizeof(char) * size);
-
-	if (chars) {
+void generateRandomString(char* buffer, size_t size) {
+	if (buffer) {
 		for (int i = 0; i < (size - 1); i++) {
-			chars[i] = (rand() % 255 + 1 - 1) + 1;
+			buffer[i] = (rand() % 255 + 1 - 1) + 1;
 		}
 
-		chars[size - 1] = 0;
+		buffer[size - 1] = 0;
 	}
-
-	return chars;
 }
 
-char* randomFilename(size_t size) {
-	char* chars = malloc(sizeof(char) * size);
-
-	if (chars) {
+void generateRandomFilename(char* buffer, size_t size) {
+	if (buffer) {
 		for (int i = 0; i < (size - 1); i++) {
-			chars[i] = (rand() % (90 + 1 - 65)) + 65;
+			buffer[i] = (rand() % (90 + 1 - 65)) + 65;
 		}
 
-		chars[size - 1] = 0;
+		buffer[size - 1] = 0;
 	}
-
-	return chars;
 }
