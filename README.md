@@ -1,6 +1,6 @@
 # garbage-dump
 
-Generates garbage files at the target location. The desired size is not guaranteed, as there may be file name collisions.
+Generates garbage files at the target location.
 
 ## Usage
 
