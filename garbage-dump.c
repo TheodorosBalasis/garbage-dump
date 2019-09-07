@@ -98,7 +98,7 @@ int main(int argc, char* argv[]) {
 
 void generateRandomString(char* buffer, size_t size) {
 	if (buffer) {
-		for (int i = 0; i < (size - 1); i++) {
+		for (int i = 0; i < (size - 1); ++i) {
 			buffer[i] = (rand() % 255 + 1 - 1) + 1;
 		}
 
@@ -108,7 +108,7 @@ void generateRandomString(char* buffer, size_t size) {
 
 void generateRandomFilename(char* buffer, size_t size) {
 	if (buffer) {
-		for (int i = 0; i < (size - 1); i++) {
+		for (int i = 0; i < (size - 1); ++i) {
 			buffer[i] = (rand() % (90 + 1 - 65)) + 65;
 		}
 
