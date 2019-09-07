@@ -40,8 +40,7 @@ int main(int argc, char* argv[]) {
 				time(&currentTime);
 				srand(currentTime);
 
-				char fileMode[2];
-				strcpy(fileMode, "w");
+				char fileMode[] = "w";
 
 				FILE* file;
 
