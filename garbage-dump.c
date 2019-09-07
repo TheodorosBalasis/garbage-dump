@@ -8,6 +8,8 @@
 // Note: ((rand() % (max + 1 - min)) + min) is used to generate random
 //       characters within a certain range.
 
+#define FILENAME_LENGTH 20
+
 // Generates a random string of set size.
 void generateRandomString(char* buffer, size_t size);
 // Generates a random file name consisting of uppercase characters.
@@ -25,9 +27,11 @@ int main(int argc, char* argv[]) {
 	} else {
 		// Program parameters.
 		char* targetLocation = argv[1];
-		size_t capacity = atoll(argv[2]);
-		size_t chunkSize = atoll(argv[3]);
-		size_t numberOfFiles = capacity / chunkSize;
+		size_t capacity = 0, chunkSize = 1, numberOfFiles;
+
+		sscanf(argv[2], '%zu', capacity);
+		sscanf(argv[3], '%zu', chunkSize);
+		numberOfFiles = capacity / chunkSize;
 
 		if (capacity) {
 			if (chunkSize) {
@@ -42,25 +46,27 @@ int main(int argc, char* argv[]) {
 				FILE* file;
 
 				char currentFile[PATH_MAX];
-				char* filename = malloc(sizeof(char) * 20);
+				char* filename = malloc(sizeof(char) * FILENAME_LENGTH);
 				char* chars = malloc(sizeof(char) * chunkSize);
 
 				// Ensure filename and chars were allocated before continuing.
 				if (filename && chars) {
 					for (int i = 0; i < numberOfFiles; i++) {
 						// Construct the full file path.
-						generateRandomFilename(filename, 20);
-						strcpy(currentFile, targetLocation);
+						generateRandomFilename(filename, FILENAME_LENGTH);
+						strncpy(currentFile, targetLocation,
+								PATH_MAX - 1 - FILENAME_LENGTH);
 						strcat(currentFile, "/");
-						strcat(currentFile, filename);
+						strncat(currentFile, filename, FILENAME_LENGTH);
 
 						// Re-generate the filename until one
 						// is generated that doesn't already exist.
 						while (access(currentFile, F_OK) != -1) {
-							generateRandomFilename(filename, 20);
-							strcpy(currentFile, targetLocation);
+							generateRandomFilename(filename, FILENAME_LENGTH);
+							strncpy(currentFile, targetLocation,
+									PATH_MAX - 1 - FILENAME_LENGTH);
 							strcat(currentFile, "/");
-							strcat(currentFile, filename);
+							strncat(currentFile, filename, FILENAME_LENGTH);
 						}
 
 						// Open current target file for writing.
