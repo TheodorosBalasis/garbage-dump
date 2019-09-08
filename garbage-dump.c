@@ -28,8 +28,8 @@ int main(int argc, char* argv[]) {
 		char* targetLocation = argv[1];
 		size_t capacity = 0, chunkSize = 1, numberOfFiles;
 
-		sscanf(argv[2], '%zu', capacity);
-		sscanf(argv[3], '%zu', chunkSize);
+		sscanf(argv[2], "%zu", &capacity);
+		sscanf(argv[3], "%zu", &chunkSize);
 		numberOfFiles = capacity / chunkSize;
 
 		if (capacity) {
