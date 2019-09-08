@@ -8,12 +8,11 @@
 // Note: ((rand() % (max + 1 - min)) + min) is used to generate random
 //       characters within a certain range.
 
-#define FILENAME_LENGTH 20
+const size_t FILENAME_LENGTH = 20;
+const char FILENAME_LEAST_CHAR = 65;
+const char FILENAME_GREATEST_CHAR = 90;
 
-// Generates a random string of set size.
-void generateRandomString(char* buffer, size_t size);
-// Generates a random file name consisting of uppercase characters.
-void generateRandomFilename(char* buffer, size_t size);
+void generateRandomString(char* buffer, size_t buffer_size, char lower_bound, char upper_bound);
 
 int main(int argc, char* argv[]) {
 	int exitCode = 0;
@@ -52,7 +51,7 @@ int main(int argc, char* argv[]) {
 				if (filename && chars) {
 					for (int i = 0; i < numberOfFiles; i++) {
 						// Construct the full file path.
-						generateRandomFilename(filename, FILENAME_LENGTH);
+						generateRandomString(filename, FILENAME_LENGTH, FILENAME_LEAST_CHAR, FILENAME_GREATEST_CHAR);
 						strncpy(currentFile, targetLocation,
 								PATH_MAX - 1 - FILENAME_LENGTH);
 						strcat(currentFile, "/");
@@ -61,7 +60,7 @@ int main(int argc, char* argv[]) {
 						// Re-generate the filename until one
 						// is generated that doesn't already exist.
 						while (access(currentFile, F_OK) != -1) {
-							generateRandomFilename(filename, FILENAME_LENGTH);
+							generateRandomString(filename, FILENAME_LENGTH, FILENAME_LEAST_CHAR, FILENAME_GREATEST_CHAR);
 							strncpy(currentFile, targetLocation,
 									PATH_MAX - 1 - FILENAME_LENGTH);
 							strcat(currentFile, "/");
@@ -72,7 +71,7 @@ int main(int argc, char* argv[]) {
 						file = fopen(currentFile, fileMode);
 
 						if (file) {
-							generateRandomString(chars, chunkSize);
+							generateRandomString(chars, chunkSize, 1, 255);
 							fputs(chars, file);
 							fclose(file);
 						} else {
@@ -101,22 +100,12 @@ int main(int argc, char* argv[]) {
 	return exitCode;
 }
 
-void generateRandomString(char* buffer, size_t size) {
+void generateRandomString(char* buffer, size_t buffer_size, char lower_bound, char upper_bound) {
 	if (buffer) {
-		for (int i = 0; i < (size - 1); ++i) {
-			buffer[i] = (rand() % 255 + 1 - 1) + 1;
+		for (int i = 0; i < (buffer_size - 1); ++i) {
+			buffer[i] = (rand() % (upper_bound + 1 - lower_bound)) + lower_bound;
 		}
 
-		buffer[size - 1] = 0;
-	}
-}
-
-void generateRandomFilename(char* buffer, size_t size) {
-	if (buffer) {
-		for (int i = 0; i < (size - 1); ++i) {
-			buffer[i] = (rand() % (90 + 1 - 65)) + 65;
-		}
-
-		buffer[size - 1] = 0;
+		buffer[buffer_size - 1] = 0;
 	}
 }
