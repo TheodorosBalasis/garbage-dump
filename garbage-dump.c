@@ -12,6 +12,8 @@
 // 1: Invalid number of arguments.
 // 2: Target directory not found.
 // 3: Directory could not be accessed.
+// 4: Provided chunk size is 0.
+// 5: Failure to allocate buffers for filename and file data.
 
 // Note: ((rand() % (max + 1 - min)) + min) is used to generate random
 //       characters within a certain range.
@@ -103,12 +105,12 @@ int main(int argc, char *argv[]) {
         } else {
           fprintf(stderr, "Could not allocate buffers for filename and file "
                           "data.\n");
-          exit_code = 1;
+          exit_code = 5;
         }
       } else {
         fprintf(stderr, "Invalid chunk size!\n");
         free(target_location);
-        exit_code = 1;
+        exit_code = 4;
       }
     }
   }
