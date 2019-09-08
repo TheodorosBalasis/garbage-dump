@@ -4,6 +4,14 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include <dirent.h>
+#include <errno.h>
+
+// EXIT CODES
+// 0: Program executed correctly.
+// 1: Invalid number of arguments.
+// 2: Target directory not found.
+// 3: Directory could not be accessed.
 
 // Note: ((rand() % (max + 1 - min)) + min) is used to generate random
 //       characters within a certain range.
@@ -13,16 +21,23 @@ const char FILENAME_LEAST_CHAR = 65;
 const char FILENAME_GREATEST_CHAR = 90;
 
 void generateRandomString(char* buffer, size_t buffer_size, char lower_bound, char upper_bound);
+int directoryExists(char* path);
 
 int main(int argc, char* argv[]) {
 	int exitCode = 0;
 
 	// Too few arguments error handling.
-	if (argc < 4) {
+	if (argc != 4) {
 		fprintf(stderr,
 		        "Usage: garbage-dump <target location> <bytes to fill> "
-		        "<file size>");
+		        "<file size>\n");
 		exitCode = 1;
+	} else if (!directoryExists(argv[1])){
+		fprintf(stderr, "Directory not found.\n");
+		exitCode = 2;
+	} else if (directoryExists(argv[1]) == -1) {
+		fprintf(stderr, "Directory could not be accessed.\n");
+		exitCode = 3;
 	} else {
 		// Program parameters.
 		char* targetLocation = argv[1];
@@ -108,4 +123,19 @@ void generateRandomString(char* buffer, size_t buffer_size, char lower_bound, ch
 
 		buffer[buffer_size - 1] = 0;
 	}
+}
+
+int directoryExists(char* path) {
+	int exists = 1;
+	DIR* directory = opendir(path);
+	
+	if (directory) {
+		closedir(directory);
+	} else if (ENOENT == errno) {
+		exists = 0;
+	} else {
+		exists = -1;
+	}
+
+	return exists;
 }
