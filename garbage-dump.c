@@ -26,7 +26,7 @@ int directoryExists(char* path);
 int main(int argc, char* argv[]) {
 	int exitCode = 0;
 
-	// Too few arguments error handling.
+	// Error handling.
 	if (argc != 4) {
 		fprintf(stderr,
 		        "Usage: garbage-dump <target location> <bytes to fill> "
