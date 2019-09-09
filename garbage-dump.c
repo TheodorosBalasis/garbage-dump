@@ -22,8 +22,8 @@ const size_t FILENAME_LENGTH = 20;
 const char FILENAME_LEAST_CHAR = 65;
 const char FILENAME_GREATEST_CHAR = 90;
 
-void generate_random_string(char *buffer, size_t buffer_size, char lower_bound,
-                            char upper_bound);
+void generate_random_string(char *buffer, size_t buffer_size, unsigned char lower_bound,
+                            unsigned char upper_bound);
 int directory_exists(char *path);
 
 int main(int argc, char *argv[]) {
@@ -99,7 +99,7 @@ int main(int argc, char *argv[]) {
             file = fopen(current_file, file_mode);
 
             if (file) {
-              generate_random_string(chars, chunk_size, (char)1, (char)255);
+              generate_random_string(chars, chunk_size, (unsigned char)1, (unsigned char)255);
               fputs(chars, file);
               fclose(file);
             } else {
@@ -118,8 +118,8 @@ int main(int argc, char *argv[]) {
   return exit_code;
 }
 
-void generate_random_string(char *buffer, size_t buffer_size, char lower_bound,
-                            char upper_bound) {
+void generate_random_string(char *buffer, size_t buffer_size, unsigned char lower_bound,
+                            unsigned char upper_bound) {
   if (buffer) {
     for (int i = 0; i < (buffer_size - 1); ++i) {
       buffer[i] = (rand() % (upper_bound + 1 - lower_bound)) + lower_bound;
