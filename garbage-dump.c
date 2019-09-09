@@ -50,13 +50,17 @@ int main(int argc, char *argv[]) {
     number_of_files = capacity / chunk_size;
 
     if (capacity) {
-      if (chunk_size) {
+      if (!chunk_size) {
+        fprintf(stderr, "Invalid chunk size!\n");
+        free(target_location);
+        exit_code = 4;
+      } else {
         // Initialize the random number generator.
         time_t current_time;
         time(&current_time);
         srand(current_time);
 
-        char file_mode[] = "w";
+        char* file_mode = "w";
 
         FILE *file;
 
@@ -65,7 +69,11 @@ int main(int argc, char *argv[]) {
         char *chars = malloc(sizeof(char) * chunk_size);
 
         // Ensure filename and chars were allocated before continuing.
-        if (filename && chars) {
+        if (!(filename && chars)) {
+          fprintf(stderr, "Could not allocate buffers for filename and file "
+                          "data.\n");
+          exit_code = 5;
+        } else {
           for (int i = 0; i < number_of_files; i++) {
             // Construct the full file path.
             generate_random_string(filename, FILENAME_LENGTH,
@@ -91,7 +99,7 @@ int main(int argc, char *argv[]) {
             file = fopen(current_file, file_mode);
 
             if (file) {
-              generate_random_string(chars, chunk_size, 1, 255);
+              generate_random_string(chars, chunk_size, (char)1, (char)255);
               fputs(chars, file);
               fclose(file);
             } else {
@@ -102,15 +110,7 @@ int main(int argc, char *argv[]) {
 
           free(filename);
           free(chars);
-        } else {
-          fprintf(stderr, "Could not allocate buffers for filename and file "
-                          "data.\n");
-          exit_code = 5;
         }
-      } else {
-        fprintf(stderr, "Invalid chunk size!\n");
-        free(target_location);
-        exit_code = 4;
       }
     }
   }
